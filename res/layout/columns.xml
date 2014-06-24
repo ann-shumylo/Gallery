@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:background="#f0f0f0">
+    <ToggleButton android:id="@+id/toggle_two_columns"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:textOn="2 columns"
+                  android:textOff="2 columns"/>
+    <ToggleButton android:id="@+id/toggle_three_columns"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:textOn="3 columns"
+                  android:textOff="3 columns"/>
+    <ToggleButton android:id="@+id/toggle_five_columns"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:textOn="5 columns"
+                  android:textOff="5 columns"/>
+</LinearLayout>
