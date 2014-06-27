@@ -13,10 +13,10 @@ import java.util.ArrayList;
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-class GridViewAdapter extends ArrayAdapter<ImageItem> {
+public class ListViewAdapter extends ArrayAdapter<ImageItem> {
     final ArrayList<ImageItem> imageItems = new ArrayList<ImageItem>();
 
-    public GridViewAdapter(Context context) {
+    public ListViewAdapter(Context context) {
         super(context, 0);
     }
 
@@ -24,14 +24,17 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
         imageItems.add(imageItem);
     }
 
+    @Override
     public int getCount() {
         return imageItems.size();
     }
 
+    @Override
     public ImageItem getItem(int position) {
         return imageItems.get(position);
     }
 
+    @Override
     public long getItemId(int position) {
         return position;
     }
@@ -43,10 +46,10 @@ class GridViewAdapter extends ArrayAdapter<ImageItem> {
 
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.gridview_item, parent, false);
+            row = inflater.inflate(R.layout.listview_item, parent, false);
             holder = new ViewHolder();
-            holder.imageName = (TextView) row.findViewById(R.id.image_name);
-            holder.image = (ImageView) row.findViewById(R.id.image);
+            holder.imageName = (TextView) row.findViewById(R.id.image_name_list);
+            holder.image = (ImageView) row.findViewById(R.id.image_list);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();

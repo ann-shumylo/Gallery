@@ -3,16 +3,23 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:background="#f0f0f0">
 
-    <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/columns"/>
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/modes"/>
 
-    <include
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            layout="@layout/activity_main"/>
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/columns"/>
+
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/grid_gallery"/>
+
+    <include android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             layout="@layout/list_gallery"/>
 
 </LinearLayout>

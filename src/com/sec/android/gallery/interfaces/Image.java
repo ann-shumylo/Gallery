@@ -8,15 +8,15 @@ import java.util.Collection;
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public interface Image {
-    public long getId();
-
-    void getBitMap(Receiver<Bitmap> receiver);
+    public Bitmap getImage();
 
     String getName();
 
-    Collection<String> getCategories();
-
     String getDescription();
 
-    float getRaiting();
+    public long getId();
+
+    Collection<String> getCategories();
+
+    float getRating();
 }
