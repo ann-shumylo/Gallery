@@ -17,14 +17,14 @@ import java.io.IOException;
 * Async task for loading the images from the SD card.
 */
 public class Receiver extends AsyncTask<Void, ImageItem, Void> {
-    LoaderListener<ImageItem> loaderListener;
+    private final LoaderListener<ImageItem> loaderListener;
 
     public Receiver(LoaderListener<ImageItem> loaderListener, Context mContext) {
         this.loaderListener = loaderListener;
         this.mContext = mContext;
     }
 
-    Context mContext;
+    private final Context mContext;
 
     @Override
     protected Void doInBackground(Void... params) {
@@ -33,20 +33,21 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         Uri uri;
 
         // Set up an array of the Thumbnail Image ID column we want
-        String[] projection = {MediaStore.Images.Thumbnails._ID};
+        String[] projection = {MediaStore.Images.Media._ID};
+
         // Create the cursor pointing to the SDCard
-        Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI,
+        Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection, // Which columns to return
                 null,       // Return all rows
                 null,
                 null);
-        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Thumbnails._ID);
+        int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
         int size = cursor.getCount();
         int imageID;
         for (int i = 0; i < size; i++) {
             cursor.moveToPosition(i);
             imageID = cursor.getInt(columnIndex);
-            uri = Uri.withAppendedPath(MediaStore.Images.Thumbnails.EXTERNAL_CONTENT_URI, "" + imageID);
+            uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + imageID);
             try {
                 bitmap = BitmapFactory.decodeStream(mContext.getContentResolver().openInputStream(uri));
                 if (bitmap != null) {
