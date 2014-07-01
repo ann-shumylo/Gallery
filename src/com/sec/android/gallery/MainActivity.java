@@ -8,8 +8,7 @@ import android.widget.*;
 import com.sec.android.gallery.interfaces.LoaderListener;
 
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener, LoaderListener<ImageItem> {
-    LinearLayout columns;
-
+    private LinearLayout columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
     private ToggleButton fiveColumns;
@@ -25,11 +24,11 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     /**
      * Image adapter for the grid view.
      */
-    private GridViewAdapter imageGridAdapter;
+    private ImagesAdapter imageGridAdapter;
     /**
      * Image adapter for the list view.
      */
-    private ListViewAdapter imageListAdapter;
+    private ImagesAdapter imageListAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,11 +75,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sdCardImagesGrid.setClipToPadding(false);
         sdCardImagesList.setClipToPadding(false);
 
-        imageGridAdapter = new GridViewAdapter(getApplicationContext());
+        imageGridAdapter = new ImagesAdapter(getApplicationContext(), R.layout.gridview_item);
         sdCardImagesGrid.setAdapter(imageGridAdapter);
 
-        imageListAdapter = new ListViewAdapter(getApplicationContext());
+        imageListAdapter = new ImagesAdapter(getApplicationContext(), R.layout.listview_item);
         sdCardImagesList.setAdapter(imageListAdapter);
+        sdCardImagesList.setVisibility(View.GONE);
     }
 
     @Override

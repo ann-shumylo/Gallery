@@ -5,7 +5,7 @@
                 android:layout_height="match_parent">
 
     <ImageView
-            android:id="@+id/image_list"
+            android:id="@+id/image"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
@@ -14,22 +14,22 @@
             android:src="@drawable/ic_launcher" />
 
     <TextView
-            android:id="@+id/image_name_list"
+            android:id="@+id/image_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_toRightOf="@id/image_list"
+            android:layout_toRightOf="@id/image"
             android:textColor="@android:color/darker_gray"/>
 
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@id/image_name_list"
+            android:layout_above="@id/image_name"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
             android:layout_alignWithParentIfMissing="true"
-            android:layout_toRightOf="@id/image_list"
+            android:layout_toRightOf="@id/image"
             android:gravity="center_vertical"/>
 
 </RelativeLayout>

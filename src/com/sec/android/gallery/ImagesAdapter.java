@@ -13,12 +13,15 @@ import java.util.ArrayList;
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-public class ListViewAdapter extends ArrayAdapter<ImageItem> {
+public class ImagesAdapter extends ArrayAdapter<ImageItem> {
     final ArrayList<ImageItem> imageItems = new ArrayList<ImageItem>();
+    int resource;
 
-    public ListViewAdapter(Context context) {
-        super(context, 0);
+    public ImagesAdapter(Context context, int resource) {
+        super(context, resource);
+        this.resource = resource;
     }
+
 
     public void addPhoto(ImageItem imageItem) {
         imageItems.add(imageItem);
@@ -46,10 +49,10 @@ public class ListViewAdapter extends ArrayAdapter<ImageItem> {
 
         if (row == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(R.layout.listview_item, parent, false);
+            row = inflater.inflate(resource, parent, false);
             holder = new ViewHolder();
-            holder.imageName = (TextView) row.findViewById(R.id.image_name_list);
-            holder.image = (ImageView) row.findViewById(R.id.image_list);
+            holder.imageName = (TextView) row.findViewById(R.id.image_name);
+            holder.image = (ImageView) row.findViewById(R.id.image);
             row.setTag(holder);
         } else {
             holder = (ViewHolder) row.getTag();
