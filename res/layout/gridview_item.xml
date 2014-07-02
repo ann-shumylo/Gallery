@@ -21,6 +21,8 @@
             android:paddingBottom="15dp"
             android:layout_gravity="bottom"
             android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textColor="@android:color/white"
             android:background="#55000000">
     </TextView>

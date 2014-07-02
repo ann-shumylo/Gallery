@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-public interface Image {
+public interface ImageDetails {
     public Bitmap getImage();
 
     String getName();

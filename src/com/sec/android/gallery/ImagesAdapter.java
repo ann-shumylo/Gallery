@@ -22,7 +22,6 @@ public class ImagesAdapter extends ArrayAdapter<ImageItem> {
         this.resource = resource;
     }
 
-
     public void addPhoto(ImageItem imageItem) {
         imageItems.add(imageItem);
     }
