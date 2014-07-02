@@ -11,6 +11,7 @@
             android:label="@string/app_name"
             android:icon="@drawable/ic_launcher">
         <activity android:name="com.sec.android.gallery.MainActivity"
+                  android:configChanges="orientation|screenSize"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
