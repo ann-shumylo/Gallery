@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.util.Log;
 import com.sec.android.gallery.interfaces.LoaderListener;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         Uri uri;
 
         // Set up an array of the Thumbnail Image ID column we want
-        String[] projection = {MediaStore.Images.Media._ID};
+        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE};
 
         // Create the cursor pointing to the SDCard
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -44,6 +45,7 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
         int size = cursor.getCount();
         int imageID;
+        getName(cursor);
         for (int i = 0; i < size; i++) {
             cursor.moveToPosition(i);
             imageID = cursor.getInt(columnIndex);
@@ -54,7 +56,7 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
                     newBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
                     bitmap.recycle();
                     if (newBitmap != null) {
-                        publishProgress(new ImageItem(newBitmap, "Image#" + i, ""));
+                        publishProgress(new ImageItem(newBitmap, cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)), ""));
                     }
                 }
             } catch (IOException e) {
@@ -63,6 +65,15 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         }
         cursor.close();
         return null;
+    }
+
+    private void getName(Cursor cursor) {
+        int count = cursor.getColumnCount();
+
+        for (int i = 0; i < count; i++) {
+            cursor.getColumnName(i);
+            Log.d("RRR", i + " " + cursor.getColumnName(i));
+        }
     }
 
     /**
