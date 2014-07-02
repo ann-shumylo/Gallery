@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:id="@+id/count_columns"
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/toggle_group"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
               android:background="#f0f0f0">
     <ToggleButton android:id="@+id/toggle_two_columns"
                   android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+                  android:layout_height="match_parent"
                   android:layout_weight="1"
+                  android:layout_marginRight="-4dp"
                   android:textOn="2 columns"
                   android:textOff="2 columns"/>
     <ToggleButton android:id="@+id/toggle_three_columns"
                   android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+                  android:layout_height="match_parent"
                   android:layout_weight="1"
-                  android:checked="true"
+                  android:layout_marginLeft="-4dp"
+                  android:layout_marginRight="-4dp"
                   android:textOn="3 columns"
-                  android:textOff="3 columns"/>
+                  android:textOff="3 columns"
+                  android:checked="true"/>
     <ToggleButton android:id="@+id/toggle_five_columns"
                   android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
+                  android:layout_height="match_parent"
                   android:layout_weight="1"
+                  android:layout_marginLeft="-4dp"
                   android:textOn="5 columns"
                   android:textOff="5 columns"/>
-</LinearLayout>
+</RadioGroup>

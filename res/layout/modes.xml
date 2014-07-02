@@ -9,7 +9,7 @@
                   android:layout_width="120dp"
                   android:layout_height="wrap_content"
                   android:checked="true"
-                  android:textOn="Grid view"
-                  android:textOff="List view"
+                  android:textOn="List view"
+                  android:textOff="Grid view"
                   android:layout_alignParentRight="true"/>
 </RelativeLayout >

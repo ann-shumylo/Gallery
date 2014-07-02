@@ -8,7 +8,7 @@ import android.widget.*;
 import com.sec.android.gallery.interfaces.LoaderListener;
 
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener, LoaderListener<ImageItem> {
-    private LinearLayout columns;
+    private RadioGroup columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
     private ToggleButton fiveColumns;
@@ -37,10 +37,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         setContentView(R.layout.main);
 
         setupViews();
-
         new Receiver(this, this).execute();
-
-        columns = (LinearLayout) findViewById(R.id.count_columns);
 
         twoColumns = (ToggleButton) findViewById(R.id.toggle_two_columns);
         threeColumns = (ToggleButton) findViewById(R.id.toggle_three_columns);
@@ -48,6 +45,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         twoColumns.setOnClickListener(this);
         threeColumns.setOnClickListener(this);
         fiveColumns.setOnClickListener(this);
+
+        columns = (RadioGroup) findViewById(R.id.toggle_group);
+        columns.setOnCheckedChangeListener(ToggleListener);
 
         findViewById(R.id.modes).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +64,20 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             }
         });
     }
+
+    /**
+     * The listener for a checked change event of the toggle buttons.
+     */
+    static final RadioGroup.OnCheckedChangeListener ToggleListener = new RadioGroup.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
+            //if one button is checked, uncheck all others
+            for (int j = 0; j < radioGroup.getChildCount(); j++) {
+                final ToggleButton view = (ToggleButton) radioGroup.getChildAt(j);
+                view.setChecked(view.getId() == i);
+            }
+        }
+    };
 
     /**
      * Setup the grid view.
@@ -90,23 +104,19 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onClick(View v) {
+        if (v == twoColumns || v == threeColumns || v == fiveColumns) {
+            columns.clearCheck();
+            columns.check(v.getId());
+        }
+
         switch (v.getId()) {
             case R.id.toggle_two_columns:
-                threeColumns.setChecked(false);
-                fiveColumns.setChecked(false);
-
                 sdCardImagesGrid.setNumColumns(2);
                 break;
             case R.id.toggle_three_columns:
-                twoColumns.setChecked(false);
-                fiveColumns.setChecked(false);
-
                 sdCardImagesGrid.setNumColumns(3);
                 break;
             case R.id.toggle_five_columns:
-                twoColumns.setChecked(false);
-                threeColumns.setChecked(false);
-
                 sdCardImagesGrid.setNumColumns(5);
                 break;
             default:
