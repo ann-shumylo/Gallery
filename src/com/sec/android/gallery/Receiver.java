@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import android.util.Log;
 import com.sec.android.gallery.interfaces.LoaderListener;
 
 import java.io.IOException;
@@ -45,7 +44,6 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
         int size = cursor.getCount();
         int imageID;
-        getName(cursor);
         for (int i = 0; i < size; i++) {
             cursor.moveToPosition(i);
             imageID = cursor.getInt(columnIndex);
@@ -65,15 +63,6 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         }
         cursor.close();
         return null;
-    }
-
-    private void getName(Cursor cursor) {
-        int count = cursor.getColumnCount();
-
-        for (int i = 0; i < count; i++) {
-            cursor.getColumnName(i);
-            Log.d("RRR", i + " " + cursor.getColumnName(i));
-        }
     }
 
     /**
