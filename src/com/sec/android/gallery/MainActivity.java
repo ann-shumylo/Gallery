@@ -63,12 +63,15 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
                 }
             }
         });
+
+        sdCardImagesGrid.setOnItemClickListener(this);
+        sdCardImagesList.setOnItemClickListener(this);
     }
 
     /**
      * The listener for a checked change event of the toggle buttons.
      */
-    static final RadioGroup.OnCheckedChangeListener ToggleListener = new RadioGroup.OnCheckedChangeListener() {
+    private static final RadioGroup.OnCheckedChangeListener ToggleListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
             //if one button is checked, uncheck all others
@@ -99,7 +102,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        int length = Toast.LENGTH_LONG;
+        Toast.makeText(getBaseContext(), imageGridAdapter.getItem(position).getName() + "\n" +
+                imageGridAdapter.getItem(position).getDescription(), length).show();
     }
 
     @Override
@@ -128,7 +133,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     public void receive(ImageItem value) {
         imageGridAdapter.addPhoto(value);
         imageGridAdapter.notifyDataSetChanged();
-
         imageListAdapter.addPhoto(value);
         imageListAdapter.notifyDataSetChanged();
     }

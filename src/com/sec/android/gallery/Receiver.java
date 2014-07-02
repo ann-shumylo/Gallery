@@ -33,7 +33,7 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
         Uri uri;
 
         // Set up an array of the Thumbnail Image ID column we want
-        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE};
+        String[] projection = {MediaStore.Images.Media._ID, MediaStore.Images.Media.TITLE, MediaStore.Images.Media.DATA};
 
         // Create the cursor pointing to the SDCard
         Cursor cursor = mContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -54,7 +54,8 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
                     newBitmap = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
                     bitmap.recycle();
                     if (newBitmap != null) {
-                        publishProgress(new ImageItem(newBitmap, cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)), ""));
+                        publishProgress(new ImageItem(newBitmap, cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.TITLE)),
+                                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))));
                     }
                 }
             } catch (IOException e) {
