@@ -53,10 +53,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             @Override
             public void onClick(View v) {
                 if (((ToggleButton) findViewById(R.id.modes)).isChecked()) {
+                    sdCardImagesGrid.setSelection(sdCardImagesList.getFirstVisiblePosition());
                     columns.setVisibility(View.VISIBLE);
                     sdCardImagesGrid.setVisibility(View.VISIBLE);
                     sdCardImagesList.setVisibility(View.GONE);
                 } else {
+                    sdCardImagesList.setSelection(sdCardImagesGrid.getFirstVisiblePosition());
                     columns.setVisibility(View.GONE);
                     sdCardImagesGrid.setVisibility(View.GONE);
                     sdCardImagesList.setVisibility(View.VISIBLE);
@@ -116,17 +118,23 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         switch (v.getId()) {
             case R.id.toggle_two_columns:
-                sdCardImagesGrid.setNumColumns(2);
+                retainPositionOfGridView(2);
                 break;
             case R.id.toggle_three_columns:
-                sdCardImagesGrid.setNumColumns(3);
+                retainPositionOfGridView(3);
                 break;
             case R.id.toggle_five_columns:
-                sdCardImagesGrid.setNumColumns(5);
+                retainPositionOfGridView(5);
                 break;
             default:
                 break;
         }
+    }
+
+    private void retainPositionOfGridView(int countColumns) {
+        int index = sdCardImagesGrid.getFirstVisiblePosition();
+        sdCardImagesGrid.setNumColumns(countColumns);
+        sdCardImagesGrid.setSelection(index);
     }
 
     @Override

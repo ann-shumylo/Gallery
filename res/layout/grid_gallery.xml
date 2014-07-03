@@ -11,7 +11,8 @@
             android:layout_height="wrap_content"
             android:verticalSpacing="0dp"
             android:horizontalSpacing="0dp"
-            android:numColumns="3">
+            android:numColumns="3"
+            android:smoothScrollbar="true">
     </GridView>
 
 </FrameLayout>
