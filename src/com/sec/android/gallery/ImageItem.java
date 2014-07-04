@@ -3,46 +3,50 @@ package com.sec.android.gallery;
 import android.graphics.Bitmap;
 import com.sec.android.gallery.interfaces.ImageDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class ImageItem implements ImageDetails {
-    private Bitmap image;
-    private String name;
-    private final String description;
+    private long mId;
+    private Bitmap mImage;
+    private String mName;
+    private final String mDescription;
+    private List<String> categories = new ArrayList<String>();
 
     public ImageItem(Bitmap image, String name, String description) {
         super();
-        this.image = image;
-        this.name = name;
-        this.description = description;
+        this.mImage = image;
+        this.mName = name;
+        this.mDescription = description;
     }
 
     @Override
     public Bitmap getImage() {
-        return image;
+        return mImage;
     }
 
     @Override
     public String getName() {
-        return name;
+        return mName;
     }
 
     @Override
     public String getDescription() {
-        return description;
+        return mDescription;
     }
 
     @Override
     public long getId() {
-        return 0;
+        return mId;
     }
 
     @Override
     public Collection<String> getCategories() {
-        return null;
+        return categories;
     }
 
     @Override
@@ -51,10 +55,10 @@ public class ImageItem implements ImageDetails {
     }
 
     public void setImage(Bitmap image) {
-        this.image = image;
+        this.mImage = image;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.mName = name;
     }
 }
