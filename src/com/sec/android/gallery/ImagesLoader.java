@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
-import com.sec.android.gallery.interfaces.LoaderListener;
+import com.sec.android.gallery.interfaces.Receiver;
 
 import java.io.IOException;
 
@@ -16,11 +16,11 @@ import java.io.IOException;
 *
 * Async task for loading the images from the SD card.
 */
-public class Receiver extends AsyncTask<Void, ImageItem, Void> {
-    private final LoaderListener<ImageItem> loaderListener;
+public class ImagesLoader extends AsyncTask<Void, ImageItem, Void> {
+    private final Receiver<ImageItem> mReceiver;
 
-    public Receiver(LoaderListener<ImageItem> loaderListener, Context mContext) {
-        this.loaderListener = loaderListener;
+    public ImagesLoader(Receiver<ImageItem> receiver, Context mContext) {
+        this.mReceiver = receiver;
         this.mContext = mContext;
     }
 
@@ -73,7 +73,7 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
      */
     @Override
     public void onProgressUpdate(ImageItem... value) {
-        loaderListener.receive(value[0]);
+        mReceiver.receive(value[0]);
     }
 
     /**
@@ -83,11 +83,11 @@ public class Receiver extends AsyncTask<Void, ImageItem, Void> {
      */
     @Override
     protected void onPostExecute(Void result) {
-        loaderListener.hideProgress();
+        mReceiver.hideProgress();
     }
 
     @Override
     protected void onPreExecute() {
-        loaderListener.showProgress();
+        mReceiver.showProgress();
     }
 }

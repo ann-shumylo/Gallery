@@ -10,5 +10,5 @@ import java.util.Collection;
 public interface ImagesProvider {
     long getImagesCount();
 
-    void getImage(long startIndex, int window, LoaderListener<Collection<Image>> receiver);
+    void getImage(long startIndex, int window, Receiver<Collection<Image>> receiver);
 }

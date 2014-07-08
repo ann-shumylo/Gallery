@@ -5,13 +5,24 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.*;
-import com.sec.android.gallery.interfaces.LoaderListener;
+import com.marchuk.dropbox.Image;
+import com.marchuk.dropbox.Receiver;
+import com.marchuk.dropbox.implementation.DropBoxManager;
+import com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl;
 
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener, LoaderListener<ImageItem> {
+import java.util.Collection;
+
+/**
+ * @author Ganna Pliskovska(g.pliskovska@samsung.com)
+ */
+public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
     private RadioGroup columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
     private ToggleButton fiveColumns;
+
+    DropBoxManager dropBoxManager;
+    ImageProviderDropBoxImpl imageProviderDropBox;
 
     /**
      * Grid view holding the images.
@@ -36,8 +47,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS); // Request progress bar
         setContentView(R.layout.main);
 
+        dropBoxManager = new DropBoxManager(MainActivity.this, "kqu8ru6p67widos", "gdpr4jk2lp9emgd");
+
+        if (!dropBoxManager.isLoggedIn()) {
+            dropBoxManager.authorize();
+        }
+
         setupViews();
-        new Receiver(this, this).execute();
+        imageProviderDropBox = new ImageProviderDropBoxImpl(dropBoxManager.getDropBoxApi());
+        imageProviderDropBox.getImages(new Receiver<Collection<Image>>() {
+            @Override
+            public void receive(Collection<Image> data) {
+                for (Image imageItem : data) {
+                    imageGridAdapter.addPhoto(imageItem);
+                    imageGridAdapter.notifyDataSetChanged();
+                    imageListAdapter.addPhoto(imageItem);
+                    imageListAdapter.notifyDataSetChanged();
+                }
+            }
+        });
 
         twoColumns = (ToggleButton) findViewById(R.id.toggle_two_columns);
         threeColumns = (ToggleButton) findViewById(R.id.toggle_three_columns);
@@ -68,6 +96,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         sdCardImagesGrid.setOnItemClickListener(this);
         sdCardImagesList.setOnItemClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        dropBoxManager.onResumeActivity();
     }
 
     /**
@@ -135,23 +169,5 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         int index = sdCardImagesGrid.getFirstVisiblePosition();
         sdCardImagesGrid.setNumColumns(countColumns);
         sdCardImagesGrid.setSelection(index);
-    }
-
-    @Override
-    public void receive(ImageItem value) {
-        imageGridAdapter.addPhoto(value);
-        imageGridAdapter.notifyDataSetChanged();
-        imageListAdapter.addPhoto(value);
-        imageListAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void showProgress() {
-        setProgressBarIndeterminateVisibility(true);
-    }
-
-    @Override
-    public void hideProgress() {
-        setProgressBarIndeterminateVisibility(false);
     }
 }

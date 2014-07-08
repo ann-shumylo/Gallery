@@ -1,20 +1,23 @@
 package com.sec.android.gallery;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.marchuk.dropbox.Image;
+import com.marchuk.dropbox.Receiver;
 
 import java.util.ArrayList;
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-public class ImagesAdapter extends ArrayAdapter<ImageItem> {
-    final ArrayList<ImageItem> imageItems = new ArrayList<ImageItem>();
+public class ImagesAdapter extends ArrayAdapter<Image> {
+    final ArrayList<Image> imageItems = new ArrayList<Image>();
     int resource;
 
     public ImagesAdapter(Context context, int resource) {
@@ -22,7 +25,7 @@ public class ImagesAdapter extends ArrayAdapter<ImageItem> {
         this.resource = resource;
     }
 
-    public void addPhoto(ImageItem imageItem) {
+    public void addPhoto(Image imageItem) {
         imageItems.add(imageItem);
     }
 
@@ -32,7 +35,7 @@ public class ImagesAdapter extends ArrayAdapter<ImageItem> {
     }
 
     @Override
-    public ImageItem getItem(int position) {
+    public Image getItem(int position) {
         return imageItems.get(position);
     }
 
@@ -43,29 +46,34 @@ public class ImagesAdapter extends ArrayAdapter<ImageItem> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        ViewHolder holder;
+        final ViewHolder holder;
 
-        if (row == null) {
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            row = inflater.inflate(resource, parent, false);
             holder = new ViewHolder();
-            holder.imageName = (TextView) row.findViewById(R.id.image_name);
-            holder.image = (ImageView) row.findViewById(R.id.image);
-            row.setTag(holder);
+            convertView = inflater.inflate(resource, null);
+            holder.imageName = (TextView) convertView.findViewById(R.id.image_name);
+            holder.image = (ImageView) convertView.findViewById(R.id.image);
+
+            convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) row.getTag();
-            row.forceLayout();
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        ImageItem item = getItem(position);
+        Image item = getItem(position);
         holder.imageName.setText(item.getName());
-        holder.image.setImageBitmap(item.getImage());
-        return row;
+        item.getBitmap(new Receiver<Bitmap>() {
+            @Override
+            public void receive(Bitmap value) {
+                holder.image.setImageBitmap(value);
+            }
+        });
+
+        return convertView;
     }
 
     static class ViewHolder {
-        TextView imageName;
         ImageView image;
+        TextView imageName;
     }
 }
