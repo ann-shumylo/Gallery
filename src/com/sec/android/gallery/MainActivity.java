@@ -1,28 +1,34 @@
 package com.sec.android.gallery;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.LruCache;
 import android.view.View;
 import android.view.Window;
 import android.widget.*;
 import com.marchuk.dropbox.Image;
+import com.marchuk.dropbox.ImageProvider;
 import com.marchuk.dropbox.Receiver;
 import com.marchuk.dropbox.implementation.DropBoxManager;
 import com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
+    private LruCache<String, Bitmap> mMemoryCache;
+
     private RadioGroup columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
     private ToggleButton fiveColumns;
 
     DropBoxManager dropBoxManager;
-    ImageProviderDropBoxImpl imageProviderDropBox;
+    ImageProvider imageProviderDropBox;
 
     /**
      * Grid view holding the images.
@@ -58,12 +64,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         imageProviderDropBox.getImages(new Receiver<Collection<Image>>() {
             @Override
             public void receive(Collection<Image> data) {
-                for (Image imageItem : data) {
-                    imageGridAdapter.addPhoto(imageItem);
-                    imageGridAdapter.notifyDataSetChanged();
-                    imageListAdapter.addPhoto(imageItem);
-                    imageListAdapter.notifyDataSetChanged();
-                }
+                imageGridAdapter.addPhotoList(new ArrayList<Image>(data));
+                imageGridAdapter.notifyDataSetChanged();
+                imageListAdapter.addPhotoList(new ArrayList<Image>(data));
+                imageListAdapter.notifyDataSetChanged();
             }
         });
 
@@ -128,10 +132,10 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sdCardImagesGrid.setClipToPadding(false);
         sdCardImagesList.setClipToPadding(false);
 
-        imageGridAdapter = new ImagesAdapter(getApplicationContext(), R.layout.gridview_item);
+        imageGridAdapter = new ImagesAdapter(this, R.layout.gridview_item);
         sdCardImagesGrid.setAdapter(imageGridAdapter);
 
-        imageListAdapter = new ImagesAdapter(getApplicationContext(), R.layout.listview_item);
+        imageListAdapter = new ImagesAdapter(this, R.layout.listview_item);
         sdCardImagesList.setAdapter(imageListAdapter);
         sdCardImagesList.setVisibility(View.GONE);
     }
@@ -163,6 +167,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             default:
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        sdCardImagesGrid.setAdapter(null);
+        sdCardImagesList.setAdapter(null);
+        super.onDestroy();
     }
 
     private void retainPositionOfGridView(int countColumns) {

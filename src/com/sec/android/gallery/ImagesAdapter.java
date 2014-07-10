@@ -12,21 +12,26 @@ import com.marchuk.dropbox.Image;
 import com.marchuk.dropbox.Receiver;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class ImagesAdapter extends ArrayAdapter<Image> {
-    final ArrayList<Image> imageItems = new ArrayList<Image>();
-    int resource;
+    List<Image> imageItems = new ArrayList<Image>();
+    int layoutResource;
 
     public ImagesAdapter(Context context, int resource) {
-        super(context, resource);
-        this.resource = resource;
+        super(context, resource, new ArrayList<Image>());
+        this.layoutResource = resource;
     }
 
     public void addPhoto(Image imageItem) {
         imageItems.add(imageItem);
+    }
+
+    public void addPhotoList(List<Image> list) {
+        imageItems = list;
     }
 
     @Override
@@ -50,8 +55,8 @@ public class ImagesAdapter extends ArrayAdapter<Image> {
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(layoutResource, null);
             holder = new ViewHolder();
-            convertView = inflater.inflate(resource, null);
             holder.imageName = (TextView) convertView.findViewById(R.id.image_name);
             holder.image = (ImageView) convertView.findViewById(R.id.image);
 
@@ -59,16 +64,15 @@ public class ImagesAdapter extends ArrayAdapter<Image> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        Image item = getItem(position);
+        Image item = imageItems.get(position);
         holder.imageName.setText(item.getName());
+
         item.getBitmap(new Receiver<Bitmap>() {
             @Override
             public void receive(Bitmap value) {
                 holder.image.setImageBitmap(value);
             }
         });
-
         return convertView;
     }
 
