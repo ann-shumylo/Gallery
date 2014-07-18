@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
-import com.sec.android.gallery.adapters.ImageAdapter;
+import com.sec.android.gallery.ImageAdapter;
 import com.sec.android.gallery.interfaces.Image;
 
 /**
