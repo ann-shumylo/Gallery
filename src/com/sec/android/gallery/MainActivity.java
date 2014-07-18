@@ -1,34 +1,35 @@
 package com.sec.android.gallery;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.util.LruCache;
 import android.view.View;
 import android.view.Window;
 import android.widget.*;
-import com.marchuk.dropbox.Image;
-import com.marchuk.dropbox.ImageProvider;
-import com.marchuk.dropbox.Receiver;
+import com.dropbox.client2.DropboxAPI;
 import com.marchuk.dropbox.implementation.DropBoxManager;
 import com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl;
+import com.samsung.image.loader.PicasaImageProvider;
+import com.sec.android.gallery.interfaces.Image;
+import com.sec.android.gallery.interfaces.ImageProvider;
+import com.sec.android.gallery.interfaces.Receiver;
+import com.sec.android.gallery.providers.DropBoxImageProvider;
+import com.sec.android.gallery.listeners.ColumnOnCheckChangedListener;
+import com.sec.android.gallery.listeners.ImageOnItemClickListener;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-public class MainActivity extends Activity implements AdapterView.OnItemClickListener, View.OnClickListener {
-    private LruCache<String, Bitmap> mMemoryCache;
-
+public class MainActivity extends Activity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
     private RadioGroup columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
     private ToggleButton fiveColumns;
 
-    DropBoxManager dropBoxManager;
-    ImageProvider imageProviderDropBox;
+    private DropBoxManager dropBoxManager;
 
     /**
      * Grid view holding the images.
@@ -41,11 +42,23 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     /**
      * Image adapter for the grid view.
      */
-    private ImagesAdapter imageGridAdapter;
+    private ImageAdapter imageGridAdapter;
+    /**
+     * Image adapter for the grid view.
+     */
+    private ImageAdapter imageListAdapter;
     /**
      * Image adapter for the list view.
      */
-    private ImagesAdapter imageListAdapter;
+    private ImageProvider imageProvider;
+    private Receiver<Collection<Image>> mReceiver;
+
+    private Mode mMode;
+
+    enum Mode {
+        DROP_BOX,
+        PICASA
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,23 +66,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS); // Request progress bar
         setContentView(R.layout.main);
 
-        dropBoxManager = new DropBoxManager(MainActivity.this, "kqu8ru6p67widos", "gdpr4jk2lp9emgd");
+        dropBoxManager = new DropBoxManager(MainActivity.this, "wuy7uomebx0kfyj", "ze468z8b8udaiqa");
 
         if (!dropBoxManager.isLoggedIn()) {
             dropBoxManager.authorize();
         }
-
         setupViews();
-        imageProviderDropBox = new ImageProviderDropBoxImpl(dropBoxManager.getDropBoxApi());
-        imageProviderDropBox.getImages(new Receiver<Collection<Image>>() {
-            @Override
-            public void receive(Collection<Image> data) {
-                imageGridAdapter.addPhotoList(new ArrayList<Image>(data));
-                imageGridAdapter.notifyDataSetChanged();
-                imageListAdapter.addPhotoList(new ArrayList<Image>(data));
-                imageListAdapter.notifyDataSetChanged();
-            }
-        });
 
         twoColumns = (ToggleButton) findViewById(R.id.toggle_two_columns);
         threeColumns = (ToggleButton) findViewById(R.id.toggle_three_columns);
@@ -78,49 +80,54 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         threeColumns.setOnClickListener(this);
         fiveColumns.setOnClickListener(this);
 
+        ((ToggleButton) findViewById(R.id.modes)).setOnCheckedChangeListener(this);
+
         columns = (RadioGroup) findViewById(R.id.toggle_group);
-        columns.setOnCheckedChangeListener(ToggleListener);
+        columns.setOnCheckedChangeListener(new ColumnOnCheckChangedListener());
 
-        findViewById(R.id.modes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (((ToggleButton) findViewById(R.id.modes)).isChecked()) {
-                    sdCardImagesGrid.setSelection(sdCardImagesList.getFirstVisiblePosition());
-                    columns.setVisibility(View.VISIBLE);
-                    sdCardImagesGrid.setVisibility(View.VISIBLE);
-                    sdCardImagesList.setVisibility(View.GONE);
-                } else {
-                    sdCardImagesList.setSelection(sdCardImagesGrid.getFirstVisiblePosition());
-                    columns.setVisibility(View.GONE);
-                    sdCardImagesGrid.setVisibility(View.GONE);
-                    sdCardImagesList.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        sdCardImagesGrid.setOnItemClickListener(this);
-        sdCardImagesList.setOnItemClickListener(this);
+        sdCardImagesGrid.setOnItemClickListener(new ImageOnItemClickListener(getApplicationContext(), imageGridAdapter));
+        sdCardImagesList.setOnItemClickListener(new ImageOnItemClickListener(getApplicationContext(), imageListAdapter));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         dropBoxManager.onResumeActivity();
-    }
-
-    /**
-     * The listener for a checked change event of the toggle buttons.
-     */
-    private static final RadioGroup.OnCheckedChangeListener ToggleListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(final RadioGroup radioGroup, final int i) {
-            //if one button is checked, uncheck all others
-            for (int j = 0; j < radioGroup.getChildCount(); j++) {
-                final ToggleButton view = (ToggleButton) radioGroup.getChildAt(j);
-                view.setChecked(view.getId() == i);
+        mReceiver = new Receiver<Collection<Image>>() {
+            @Override
+            public void receive(Collection<Image> data) {
+                Iterator<Image> iterator = data.iterator();
+                for (int i = 0; i < Math.min(data.size(), 30); i++) {
+                    imageGridAdapter.addPhoto(i, iterator.next());
+                    imageGridAdapter.notifyDataSetChanged();
+                    imageListAdapter.addPhoto(i, iterator.next());
+                    imageListAdapter.notifyDataSetChanged();
+                }
             }
-        }
-    };
+        };
+        ((ToggleButton) findViewById(R.id.loader)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                imageGridAdapter.clean();
+                imageGridAdapter.notifyDataSetChanged();
+                imageListAdapter.clean();
+                imageListAdapter.notifyDataSetChanged();
+                if (isChecked) {
+                    mMode = Mode.PICASA;
+                    imageProvider = new com.sec.android.gallery.providers.PicasaImageProvider(new PicasaImageProvider(new PicasaImageProvider.OnInitializedListener() {
+                        @Override
+                        public void onInitialized() {
+                            imageProvider.getImages(mReceiver);
+                        }
+                    }));
+                } else {
+                    mMode = Mode.DROP_BOX;
+                    imageProvider = new DropBoxImageProvider(new ImageProviderDropBoxImpl(dropBoxManager.getDropBoxApi(), DropboxAPI.ThumbSize.ICON_256x256));
+                    imageProvider.getImages(mReceiver);
+                }
+            }
+        });
+    }
 
     /**
      * Setup the grid view.
@@ -132,19 +139,12 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sdCardImagesGrid.setClipToPadding(false);
         sdCardImagesList.setClipToPadding(false);
 
-        imageGridAdapter = new ImagesAdapter(this, R.layout.gridview_item);
+        imageGridAdapter = new ImageAdapter(this, R.layout.gridview_item);
         sdCardImagesGrid.setAdapter(imageGridAdapter);
 
-        imageListAdapter = new ImagesAdapter(this, R.layout.listview_item);
+        imageListAdapter = new ImageAdapter(this, R.layout.listview_item);
         sdCardImagesList.setAdapter(imageListAdapter);
         sdCardImagesList.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        int length = Toast.LENGTH_LONG;
-        Toast.makeText(getBaseContext(), imageGridAdapter.getItem(position).getName() + "\n" +
-                imageGridAdapter.getItem(position).getDescription(), length).show();
     }
 
     @Override
@@ -170,9 +170,26 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
     @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+            sdCardImagesGrid.setSelection(sdCardImagesList.getFirstVisiblePosition());
+            columns.setVisibility(View.VISIBLE);
+            sdCardImagesGrid.setVisibility(View.VISIBLE);
+            sdCardImagesList.setVisibility(View.GONE);
+        } else {
+            sdCardImagesList.setSelection(sdCardImagesGrid.getFirstVisiblePosition());
+            columns.setVisibility(View.GONE);
+            sdCardImagesGrid.setVisibility(View.GONE);
+            sdCardImagesList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         sdCardImagesGrid.setAdapter(null);
         sdCardImagesList.setAdapter(null);
+        imageGridAdapter.clean();
+        imageGridAdapter.notifyDataSetChanged();
         super.onDestroy();
     }
 
@@ -182,3 +199,9 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         sdCardImagesGrid.setSelection(index);
     }
 }
+
+
+
+
+
+
