@@ -3,7 +3,8 @@
           package="com.sec.android.gallery"
           android:versionCode="1"
           android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="19"/>
+    <uses-sdk android:minSdkVersion="18"
+            android:targetSdkVersion="19"/>
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -11,11 +12,21 @@
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
 
     <application
-            android:label="@string/app_name"
-            android:icon="@drawable/ic_launcher">
-        <activity android:name="com.sec.android.gallery.MainActivity"
+            android:icon="@drawable/ic_launcher"
+            android:allowBackup="false">
+        <activity android:name=".DropBoxActivity"
+                  android:taskAffinity="com.sec.android.gallery.DropBoxActivity"
                   android:configChanges="orientation|screenSize"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name_drop_box">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".PicasaActivity"
+                  android:taskAffinity="com.sec.android.gallery.PicasaActivity"
+                  android:configChanges="orientation|screenSize"
+                  android:label="@string/app_name_picasa">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -29,7 +40,6 @@
                 <!-- Change this to be db- followed by your app key -->
                 <data android:scheme="db-wuy7uomebx0kfyj" />
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
