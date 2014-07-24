@@ -1,6 +1,7 @@
 package com.sec.android.gallery;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -8,17 +9,17 @@ import android.widget.*;
 import com.sec.android.gallery.interfaces.Image;
 import com.sec.android.gallery.interfaces.ImageProvider;
 import com.sec.android.gallery.interfaces.Receiver;
-import com.sec.android.gallery.listeners.ColumnOnCheckChangedListener;
-import com.sec.android.gallery.listeners.ImageOnItemClickListener;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
-
 
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class MainActivity extends Activity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
+    ProgressDialog mProgressDialog;
+    private final ImageCacheManager imageLruCache = new ImageCacheManager();
+
     private RadioGroup columns;
     private ToggleButton twoColumns;
     private ToggleButton threeColumns;
@@ -50,6 +51,9 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS); // Request progress bar
         setContentView(R.layout.main);
 
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.show();
+
         setupViews();
 
         twoColumns = (ToggleButton) findViewById(R.id.toggle_two_columns);
@@ -62,25 +66,35 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         ((ToggleButton) findViewById(R.id.modes)).setOnCheckedChangeListener(this);
 
         columns = (RadioGroup) findViewById(R.id.toggle_group);
-        columns.setOnCheckedChangeListener(new ColumnOnCheckChangedListener());
+        columns.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                //if one button is checked, uncheck all others
+                for (int j = 0; j < group.getChildCount(); j++) {
+                    final ToggleButton view = (ToggleButton) group.getChildAt(j);
+                    view.setChecked(view.getId() == checkedId);
+                }
+            }
+        });
 
-        imagesGridView.setOnItemClickListener(new ImageOnItemClickListener(getApplicationContext(), imageGridAdapter));
-        imagesListView.setOnItemClickListener(new ImageOnItemClickListener(getApplicationContext(), imageListAdapter));
-    }
+        AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int length = Toast.LENGTH_LONG;
+                Toast.makeText(getApplicationContext(), ((Image) imageGridAdapter.getItem(position)).getName() + "\n" +
+                        ((Image) imageGridAdapter.getItem(position)).getDescription(), length).show();
+            }
+        };
+        imagesGridView.setOnItemClickListener(onItemClickListener);
+        imagesListView.setOnItemClickListener(onItemClickListener);
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         mReceiver = new Receiver<Collection<Image>>() {
             @Override
             public void receive(Collection<Image> data) {
-                Iterator<Image> iterator = data.iterator();
-                for (int i = 0; i < Math.min(data.size(), 30); i++) {
-                    imageGridAdapter.addPhoto(i, iterator.next());
-                    imageGridAdapter.notifyDataSetChanged();
-                    imageListAdapter.addPhoto(i, iterator.next());
-                    imageListAdapter.notifyDataSetChanged();
-                }
+                imageGridAdapter.addPhotoList(new ArrayList<Image>(data));
+                imageGridAdapter.notifyDataSetChanged();
+                imageListAdapter.addPhotoList(new ArrayList<Image>(data));
+                imageListAdapter.notifyDataSetChanged();
             }
         };
     }
@@ -146,6 +160,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         imagesListView.setAdapter(null);
         imageGridAdapter.clean();
         imageGridAdapter.notifyDataSetChanged();
+        imageLruCache.memoryCache.evictAll();
+
         super.onDestroy();
     }
 

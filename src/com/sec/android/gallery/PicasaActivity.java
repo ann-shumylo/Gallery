@@ -18,9 +18,11 @@ public class PicasaActivity extends MainActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         imageProvider = new com.sec.android.gallery.providers.PicasaImageProvider(new PicasaImageProvider(new PicasaImageProvider.OnInitializedListener() {
             @Override
             public void onInitialized() {
+                mProgressDialog.dismiss();
                 imageProvider.getImages(mReceiver);
             }
         }));
