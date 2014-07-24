@@ -8,9 +8,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.sec.android.gallery.R;
+import com.sec.android.gallery.interfaces.OnBitmapLoadListener;
 import com.sec.android.gallery.interfaces.Image;
-import com.sec.android.gallery.interfaces.Receiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +18,15 @@ import java.util.List;
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class ImageAdapter extends BaseAdapter {
-    List<Image> imageItems = new ArrayList<Image>();
-    private Context mContext;
-    private int mLayoutResource;
+    private final List<Image> imageItems = new ArrayList<Image>();
+    private final Context mContext;
+    private final int mLayoutResource;
+    private final ImageCacheManager imageLruCache = new ImageCacheManager();
 
     public ImageAdapter(Context context, int layoutResource) {
-        this.mContext = context;
-        this.mLayoutResource = layoutResource;
+        mContext = context;
+        mLayoutResource = layoutResource;
     }
-
-//    public void addPhoto(Image imageItem) {
-//        imageItems.add(imageItem);
-//    }
 
     public void addPhoto(Image imageItem) {
         imageItems.add(imageItem);
@@ -64,8 +60,8 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder holder;
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(mLayoutResource, null);
@@ -77,20 +73,20 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-        Image imageItem = imageItems.get(position);
+        final Image imageItem = imageItems.get(position);
         holder.imageName.setText(imageItem.getName());
-        holder.imageView.setImageBitmap(null);
-        final ViewHolder finalHolder = holder;
-        final int requestPosition = position;
         holder.neededPosition = position;
-        imageItem.getBitmap(new Receiver<Bitmap>() {
+
+        holder.imageView.setImageBitmap(null);
+        imageLruCache.getImage(imageItem, new OnBitmapLoadListener() {
             @Override
-            public void receive(Bitmap bitmap) {
-                if (requestPosition == finalHolder.neededPosition) {
-                    finalHolder.imageView.setImageBitmap(bitmap);
+            public void onBitmapLoaded(Bitmap bitmap) {
+                if (position == holder.neededPosition) {
+                    holder.imageView.setImageBitmap(bitmap);
                 }
             }
         });
+
         return convertView;
     }
 
@@ -100,11 +96,3 @@ public class ImageAdapter extends BaseAdapter {
         int neededPosition;
     }
 }
-
-//private SparseArray<View> viewsList = new SparseArray<View>(); //private Map<Integer, View> myViews = new HashMap<Integer, View>();
-//View gridView = viewsList.get(position);
-
-//        viewsList.put(position, gridView);
-//        if (viewsList.size() == 50) {
-//            viewsList.clear();
-//        }
