@@ -16,14 +16,10 @@ import java.util.Collection;
 /**
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
-public class MainActivity extends Activity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener {
-    ProgressDialog mProgressDialog;
-    private final ImageCacheManager imageLruCache = new ImageCacheManager();
-
+public class MainActivity extends Activity implements View.OnClickListener {
+    private final ImageCacheManager imageCacheManager = new ImageCacheManager();
+    private ProgressDialog mProgressDialog;
     private RadioGroup columns;
-    private ToggleButton twoColumns;
-    private ToggleButton threeColumns;
-    private ToggleButton fiveColumns;
 
     /**
      * Grid view holding the images.
@@ -52,20 +48,33 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
         setContentView(R.layout.main);
 
         mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setMessage("Loading...");
         mProgressDialog.show();
 
         setupViews();
 
-        twoColumns = (ToggleButton) findViewById(R.id.toggle_two_columns);
-        threeColumns = (ToggleButton) findViewById(R.id.toggle_three_columns);
-        fiveColumns = (ToggleButton) findViewById(R.id.toggle_five_columns);
-        twoColumns.setOnClickListener(this);
-        threeColumns.setOnClickListener(this);
-        fiveColumns.setOnClickListener(this);
-
-        ((ToggleButton) findViewById(R.id.modes)).setOnCheckedChangeListener(this);
-
         columns = (RadioGroup) findViewById(R.id.toggle_group);
+        findViewById(R.id.toggle_two_columns).setOnClickListener(this);
+        findViewById(R.id.toggle_three_columns).setOnClickListener(this);
+        findViewById(R.id.toggle_five_columns).setOnClickListener(this);
+
+        ((ToggleButton) findViewById(R.id.modes)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    imagesGridView.setSelection(imagesListView.getFirstVisiblePosition());
+                    columns.setVisibility(View.VISIBLE);
+                    imagesGridView.setVisibility(View.VISIBLE);
+                    imagesListView.setVisibility(View.GONE);
+                } else {
+                    imagesListView.setSelection(imagesGridView.getFirstVisiblePosition());
+                    columns.setVisibility(View.GONE);
+                    imagesGridView.setVisibility(View.GONE);
+                    imagesListView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         columns.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -95,6 +104,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
                 imageGridAdapter.notifyDataSetChanged();
                 imageListAdapter.addPhotoList(new ArrayList<Image>(data));
                 imageListAdapter.notifyDataSetChanged();
+                mProgressDialog.hide();
             }
         };
     }
@@ -119,11 +129,8 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
 
     @Override
     public void onClick(View v) {
-        if (v == twoColumns || v == threeColumns || v == fiveColumns) {
-            columns.clearCheck();
-            columns.check(v.getId());
-        }
-
+        columns.clearCheck();
+        columns.check(v.getId());
         switch (v.getId()) {
             case R.id.toggle_two_columns:
                 retainPositionOfGridView(2);
@@ -140,28 +147,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Comp
     }
 
     @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-            imagesGridView.setSelection(imagesListView.getFirstVisiblePosition());
-            columns.setVisibility(View.VISIBLE);
-            imagesGridView.setVisibility(View.VISIBLE);
-            imagesListView.setVisibility(View.GONE);
-        } else {
-            imagesListView.setSelection(imagesGridView.getFirstVisiblePosition());
-            columns.setVisibility(View.GONE);
-            imagesGridView.setVisibility(View.GONE);
-            imagesListView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
     protected void onDestroy() {
         imagesGridView.setAdapter(null);
         imagesListView.setAdapter(null);
         imageGridAdapter.clean();
         imageGridAdapter.notifyDataSetChanged();
-        imageLruCache.memoryCache.evictAll();
-
+        imageListAdapter.clean();
+        imageListAdapter.notifyDataSetChanged();
+        imageCacheManager.memoryCache.evictAll();
         super.onDestroy();
     }
 

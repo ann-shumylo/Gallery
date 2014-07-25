@@ -22,7 +22,6 @@ public class PicasaActivity extends MainActivity {
         imageProvider = new com.sec.android.gallery.providers.PicasaImageProvider(new PicasaImageProvider(new PicasaImageProvider.OnInitializedListener() {
             @Override
             public void onInitialized() {
-                mProgressDialog.dismiss();
                 imageProvider.getImages(mReceiver);
             }
         }));
