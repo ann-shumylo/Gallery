@@ -38,7 +38,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
      */
     private ImageAdapter imageListAdapter;
 
-    ImageProvider imageProvider;
+    ImageProvider mImageProvider;
     Receiver<Collection<Image>> mReceiver;
 
     @Override

@@ -21,7 +21,7 @@ public class ImageAdapter extends BaseAdapter {
     private final List<Image> imageItems = new ArrayList<Image>();
     private final Context mContext;
     private final int mLayoutResource;
-    private final ImageCacheManager imageLruCache = new ImageCacheManager();
+    private final ImageCacheManager imageCacheManager = new ImageCacheManager();
 
     public ImageAdapter(Context context, int layoutResource) {
         mContext = context;
@@ -78,7 +78,7 @@ public class ImageAdapter extends BaseAdapter {
         holder.neededPosition = position;
 
         holder.imageView.setImageBitmap(null);
-        imageLruCache.getImage(imageItem, new OnBitmapLoadListener() {
+        imageCacheManager.getImage(imageItem, new OnBitmapLoadListener() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap) {
                 if (position == holder.neededPosition) {

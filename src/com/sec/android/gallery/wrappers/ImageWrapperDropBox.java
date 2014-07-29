@@ -9,7 +9,7 @@ import java.util.Collection;
  * @author Ganna Pliskovska(g.pliskovska@samsung.com)
  */
 public class ImageWrapperDropBox implements Image<com.marchuk.dropbox.Receiver> {
-    com.marchuk.dropbox.Image mDropBoxImage;
+    private final com.marchuk.dropbox.Image mDropBoxImage;
 
     public ImageWrapperDropBox(com.marchuk.dropbox.Image dropBoxImage) {
         this.mDropBoxImage = dropBoxImage;

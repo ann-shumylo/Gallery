@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class DropBoxImageProvider implements ImageProvider {
 
-    private com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl mProvider;
+    private final com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl mProvider;
 
     public DropBoxImageProvider(com.marchuk.dropbox.implementation.ImageProviderDropBoxImpl provider) {
         this.mProvider = provider;

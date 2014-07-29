@@ -27,8 +27,8 @@ public class DropBoxActivity extends MainActivity {
     protected void onResume() {
         super.onResume();
         dropBoxManager.onResumeActivity();
-        imageProvider = new DropBoxImageProvider(new ImageProviderDropBoxImpl(dropBoxManager.getDropBoxApi(), DropboxAPI.ThumbSize.ICON_256x256));
-                    imageProvider.getImages(mReceiver);
+        mImageProvider = new DropBoxImageProvider(new ImageProviderDropBoxImpl(dropBoxManager.getDropBoxApi(), DropboxAPI.ThumbSize.ICON_256x256));
+                    mImageProvider.getImages(mReceiver);
     }
 }
 

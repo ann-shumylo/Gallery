@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 public class PicasaImageProvider implements ImageProvider {
 
-    private com.samsung.image.loader.PicasaImageProvider mProvider;
+    private final com.samsung.image.loader.PicasaImageProvider mProvider;
 
     public PicasaImageProvider(com.samsung.image.loader.PicasaImageProvider provider) {
         this.mProvider = provider;
